@@ -1,0 +1,14 @@
+# Mac系统缓存文件，永久忽略
+.DS_Store
+**/.DS_Store
+
+# Java项目相关文件
+*.class
+*.jar
+*.war
+*.iml
+.idea/
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
