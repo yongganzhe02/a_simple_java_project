@@ -5,6 +5,7 @@ import dao.UserDao;
 import dao.imp.UserDaoImp;
 import service.UserService;
 import util.DBUtil;
+import util.SimpleConnectionPool;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,10 +18,16 @@ public class UserServiceImp implements UserService {
     public boolean addUser(User user) {
         boolean b = false;
         UserDao userDao = new UserDaoImp();
-        try (Connection con = DBUtil.getConnection();) {
+        Connection con = null;
+        try 
+        {
+        	con = SimpleConnectionPool.getConnectionFromPool();
             b = userDao.addUser(user, con);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        finally {
+        	SimpleConnectionPool.release(con);     
         }
         return b;
     }
@@ -30,10 +37,14 @@ public class UserServiceImp implements UserService {
     public boolean deleteUser(String id) {
         boolean b = false;
         UserDao userDao = new UserDaoImp();
-        try (Connection con = DBUtil.getConnection();) {
+        Connection con = null;
+        try  {
+        	con = SimpleConnectionPool.getConnectionFromPool();
             b = userDao.deleteUser(id, con);
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+        	SimpleConnectionPool.release(con);         
         }
         return b;
     }
@@ -44,10 +55,15 @@ public class UserServiceImp implements UserService {
 
         User user = null;
         UserDao userDao = new UserDaoImp();
-        try (Connection con = DBUtil.getConnection();) {
+        Connection con = null;
+        try  {
+        	con = SimpleConnectionPool.getConnectionFromPool();
             user = userDao.getUser(id, con);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        finally {
+        	SimpleConnectionPool.release(con);
         }
         return user;
     }
@@ -57,10 +73,15 @@ public class UserServiceImp implements UserService {
     public int getAllUserNum() {
         int number = 0;
         UserDao userDao = new UserDaoImp();
-        try (Connection con = DBUtil.getConnection();) {
+        Connection con = null;
+        try 
+        {
+        	con = SimpleConnectionPool.getConnectionFromPool();
             number = userDao.getAllUserNum(con);
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+        	SimpleConnectionPool.release(con);          
         }
         return number;
     }
@@ -69,11 +90,15 @@ public class UserServiceImp implements UserService {
     public List<User> getAllUser(int pageNo, int pageSize) {
         List<User> users = null;
         UserDao userDao = new UserDaoImp();
-        try (Connection con = DBUtil.getConnection();) {
+        Connection con = null;
+        try  {
+        	con = SimpleConnectionPool.getConnectionFromPool();
             int rowNum = (pageNo - 1) * pageSize;
             users = userDao.getAllUser(rowNum, pageSize, con);
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+        	SimpleConnectionPool.release(con);           
         }
         return users;
     }
@@ -86,7 +111,7 @@ public class UserServiceImp implements UserService {
         UserDao userDao = new UserDaoImp();
         Connection con = null;
         try {
-            con = DBUtil.getConnection();
+        	con = SimpleConnectionPool.getConnectionFromPool();
             con.setAutoCommit(false);
             b = userDao.updateUser(user, con);
             con.commit();
@@ -100,9 +125,9 @@ public class UserServiceImp implements UserService {
                 }
             }
         } finally {
-            DBUtil.close(con);
-            return b;
+        	SimpleConnectionPool.release(con);
         }
+        return b;
     }
 }
 
